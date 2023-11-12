@@ -26,6 +26,9 @@ import requests
 nltk.download("punkt")
 nltk.download("stopwords")
 
+# UNCOMMENT ----------------
+query = input()
+
 
 def inference(query):
     keywords_amount = 5
@@ -45,7 +48,6 @@ def inference(query):
 
         return keywords_with_weights
 
-    
     text = remove_special_characters(query)
 
     tokens = word_tokenize(text)
@@ -87,7 +89,7 @@ def inference(query):
             "inflation",
             "trading",
             "news",
-        ]
+    ]
 
     keywords_with_weights = prioritize_keywords(
         remove_special_characters(query), field_keywords
@@ -105,7 +107,6 @@ def inference(query):
 
     for keyword in sorted_ck:
         keywordList.append(keyword)
-
 
     try:
         from googlesearch import search
@@ -175,11 +176,12 @@ def inference(query):
 
     process = CrawlerProcess(
         # settings={'CLOSESPIDER_PAGECOUNT': 100,'USER_AGENT': 'my-cool-project'}
-        settings={"CLOSESPIDER_TIMEOUT": 20, "USER_AGENT": "SustainabLLM"}
+        settings={"CLOSESPIDER_TIMEOUT": 20, 'CLOSESPIDER_PAGECOUNT': 150, "USER_AGENT": "SustainabLLM"}
     )
 
     process.crawl(MySpider)
     process.start()
+    process.stop()
 
     best_index_scores = {}
     best_website_page = {}
@@ -228,5 +230,5 @@ def inference(query):
     try:
         # best_text = best_website_page[max(best_index_scores, key=best_index_scores.get)]
         return best_text
-    except Exception as e:
-        print(e)
+    except:
+        print("error")
