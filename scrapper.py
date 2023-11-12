@@ -23,13 +23,6 @@ from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 import requests
 
-nltk.download("punkt")
-nltk.download("stopwords")
-
-# UNCOMMENT ----------------
-query = input()
-
-
 def inference(query):
     keywords_amount = 5
     keywordList = []
