@@ -6,11 +6,12 @@ import torch
 from codecarbon import EmissionsTracker
 import scrapper
 import os
+import nltk
 #import summarization as sumlib
 tracker = EmissionsTracker()
 
-
-
+nltk.download("punkt")
+nltk.download("stopwords")
 
 # Initialize FastAPI app
 app = FastAPI()
