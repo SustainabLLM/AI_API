@@ -46,6 +46,6 @@ def summarizer(model, tokenizer, prompt):
     """
     inputs = tokenizer(prompt, max_length=2048, return_tensors="pt")
     
-    summary_ids = model.generate(inputs["input_ids"], num_beams=2, min_length=2000, max_length=3000)
+    summary_ids = model.generate(inputs["input_ids"], min_length=2000, max_length=3000)
 
     return tokenizer.batch_decode(summary_ids)[0]
