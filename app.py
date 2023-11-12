@@ -17,25 +17,55 @@ nltk.download("stopwords")
 app = FastAPI()
 
 torch.set_default_device("cuda")
-model = AutoModelForCausalLM.from_pretrained("microsoft/phi-1_5", trust_remote_code=True)
-tokenizer = AutoTokenizer.from_pretrained("microsoft/phi-1_5", trust_remote_code=True)
 
-tokenizer_sum = AutoTokenizer.from_pretrained("sshleifer/distilbart-xsum-12-3")
-model_sum = AutoModelForSeq2SeqLM.from_pretrained("sshleifer/distilbart-xsum-12-3")
+def load_distilbart_model():
+    """
+    Loads and returns the tokenizer and model from the 'sshleifer/distilbart-cnn-6-6' pretrained model.
 
-def summarizer(text):
-  inputs_sum = tokenizer_sum(text, 
-                    max_length=1024, 
-                    truncation=True,
-                    return_tensors="pt")
+    This function is specifically designed for loading the DistilBART model which is a distilled version
+    of the BART model fine-tuned for summarization tasks.
+
+    Returns:
+        tokenizer (AutoTokenizer): The tokenizer for the 'sshleifer/distilbart-cnn-6-6' model.
+        model (AutoModelForSeq2SeqLM): The sequence-to-sequence language model.
+    """
+    tokenizer = AutoTokenizer.from_pretrained("sshleifer/distilbart-cnn-6-6")
+    model = AutoModelForSeq2SeqLM.from_pretrained("sshleifer/distilbart-cnn-6-6")
+    return tokenizer, model
+
+def summarizer(model, tokenizer, prompt):
+    """
+    Generates a summary for a given text prompt using the specified model and tokenizer.
+
+    This function takes a text prompt, tokenizes it using the provided tokenizer, and then
+    generates a summary using the specified model. The function is designed to work with
+    models that are suitable for summarization tasks.
+
+    Parameters:
+        model (Any): A pre-trained model from the Hugging Face library which is capable of sequence-to-sequence tasks.
+        tokenizer (Any): The tokenizer corresponding to the model, used for converting the prompt text into a format suitable for the model.
+        prompt (str): The text to be summarized.
+
+    Returns:
+        str: The generated summary of the input text.
     
-  summary_ids = model_sum.generate(inputs_sum["input_ids"])
-  summary = tokenizer_sum.batch_decode(summary_ids, 
-                                  skip_special_tokens=True, 
-                                  clean_up_tokenization_spaces=False)
-  plot = list(summary[0].split('.'))
-  return plot
+    Example:
+        model, tokenizer = load_distilbart_model()
+        text = "Your long text to summarize goes here."
+        summary = summarize(model, tokenizer, text)
+        print(summary)
 
+    Note:
+        This function assumes that the 'model' and 'tokenizer' provided are compatible and 
+        properly configured for summarization tasks. It does not perform error checking for 
+        model and tokenizer compatibility.
+    """
+    inputs = tokenizer(prompt, max_length=2048, return_tensors="pt")
+    
+    summary_ids = model.generate(inputs["input_ids"], min_length=125, max_length=300)
+
+    return tokenizer.batch_decode(summary_ids)[0]
+  
 # Define a request model
 class PromptRequest(BaseModel):
     prompt: str
